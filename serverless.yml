@@ -1,4 +1,4 @@
-service: s3-file-api-new
+service: s3-file-api
 
 provider:
   name: aws
@@ -15,8 +15,7 @@ plugins:
   - serverless-iam-roles-per-function
 
 custom:
-  # Updated bucket name to adhere to AWS naming conventions
-  fileBucketName: s3-file-bucket-new-dev-${self:provider.stage}
+  fileBucketName: s3-file-bucket-${self:provider.stage}
 
 functions:
   s3FileUploader:
@@ -59,10 +58,4 @@ functions:
           - "s3:DeleteObject"
         Resource: arn:aws:s3:::${self:custom.fileBucketName}/*
 
-resources:
-  Resources:
-    FileBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: s3-file-api-new
-        AccessControl: Private
+
