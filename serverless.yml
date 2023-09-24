@@ -15,7 +15,8 @@ plugins:
   - serverless-iam-roles-per-function
 
 custom:
-  fileBucketName: s3-file-bucket-${self:provider.stage}
+  # Updated bucket name to adhere to AWS naming conventions
+  fileBucketName: s3-file-bucket-new-dev-${self:provider.stage}
 
 functions:
   s3FileUploader:
@@ -23,14 +24,15 @@ functions:
     name: s3-file-uploader
     description: A lambda handler that uploads a file to an S3 bucket based on an API Gateway trigger.
     events:
-      - s3:
-          bucket: ${self:custom.fileBucketName}
-          event: s3:ObjectCreated:*
+      - http:
+          path: file
+          method: POST
     iamRoleStatements:
       - Effect: Allow
         Action:
           - "s3:Put*"
         Resource: arn:aws:s3:::${self:custom.fileBucketName}/*
+
   s3FileGet:
     handler: src/get.handler
     name: s3-file-get
@@ -43,7 +45,11 @@ functions:
       - Effect: Allow
         Action:
           - "s3:Get*"
-        Resource: arn:aws:s3:::${self:custom.fileBucketName}/*
+          - "logs:TagResource" # Add this permission for CloudWatch Logs tagging
+        Resource:
+          - arn:aws:s3:::${self:custom.fileBucketName}/*
+          - arn:aws:logs:*:*:* # This allows tagging CloudWatch Logs resources
+
   s3FileDelete:
     handler: src/delete.handler
     name: s3-file-delete
@@ -57,3 +63,4 @@ functions:
         Action:
           - "s3:DeleteObject"
         Resource: arn:aws:s3:::${self:custom.fileBucketName}/*
+
