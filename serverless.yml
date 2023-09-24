@@ -1,8 +1,18 @@
 service: s3-file-api
 
+# provider:
+#   name: aws
+#   runtime: nodejs12.x
+#   stage: dev
+#   region: ap-south-1
+#   apiName: ${self:service}
+#   memorySize: 128 # mb
+#   timeout: 10 # seconds
+#   environment:
+#     FILE_UPLOAD_BUCKET_NAME: ${self:custom.fileBucketName}
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs12.x  # You can update this to a more recent runtime if desired
   stage: dev
   region: ap-south-1
   apiName: ${self:service}
@@ -10,6 +20,15 @@ provider:
   timeout: 10 # seconds
   environment:
     FILE_UPLOAD_BUCKET_NAME: ${self:custom.fileBucketName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+        - logs:TagResource
+      Resource: '*'
+
 
 plugins:
   - serverless-iam-roles-per-function
@@ -75,4 +94,5 @@ resources:
     FileBucket:
       Type: AWS::S3::Bucket
       Properties:
+        BucketName: ${self:custom.fileBucketName}
         AccessControl: Private
