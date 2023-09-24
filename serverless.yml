@@ -31,7 +31,10 @@ functions:
       - Effect: Allow
         Action:
           - "s3:Put*"
-        Resource: arn:aws:s3:::${self:custom.fileBucketName}/*
+          - "logs:TagResource" # Add this permission for CloudWatch Logs tagging
+        Resource:
+          - arn:aws:s3:::${self:custom.fileBucketName}/*
+          - arn:aws:logs:*:*:* # This allows tagging CloudWatch Logs resources
 
   s3FileGet:
     handler: src/get.handler
