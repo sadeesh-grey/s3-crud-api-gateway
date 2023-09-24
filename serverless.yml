@@ -62,5 +62,15 @@ functions:
       - Effect: Allow
         Action:
           - "s3:DeleteObject"
-        Resource: arn:aws:s3:::${self:custom.fileBucketName}/*
+          - "logs:TagResource" # Add this permission for CloudWatch Logs tagging
+        Resource:
+          - arn:aws:s3:::${self:custom.fileBucketName}/*
+          - arn:aws:logs:*:*:* # This allows tagging CloudWatch Logs resources
 
+resources:
+  Resources:
+    FileBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.fileBucketName}
+        AccessControl: Private
